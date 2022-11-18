@@ -88,10 +88,11 @@ void SerialResultCalculation(double* pMatrix, double* pMatrix2,
 void ParallelResultCalculation(double* pMatrix, double* pMatrix2,
 	double* pResult, int Size) {
 	int i, j, k ; 
-omp_set_num_threads(4);
-#pragma omp parallel for private (j)
+omp_set_num_threads(6);
+#pragma omp parallel for private (i,j, k)
 	for (i = 0; i < Size; i++) 
     {
+		//printf("iter %d", i);
 		for (j = 0; j < Size; j++){
             double dot = 0;
 			for (k = 0; k < Size; k++) {
@@ -127,16 +128,16 @@ int main() {
 	ProcessInitialization(pMatrix, pMatrix2, pResult, Size);
 	// Matrix and vector output
 	// printf("Initial Matrix1 \n");
-	// PrintPMatrix(pMatrix, Size, Size);
+	//PrintPMatrix(pMatrix, Size, Size);
     // printf("Initial Matrix2 \n");
     // PrintPMatrix2(pMatrix2, Size, Size);
 	// Matrix-vector multiplication
 	Start = GetTime();
-	//ParallelResultCalculation(pMatrix, pMatrix2, pResult, Size);
-    SerialResultCalculation( pMatrix, pMatrix2,pResult, Size);
+	ParallelResultCalculation(pMatrix, pMatrix2, pResult, Size);
+    //SerialResultCalculation( pMatrix, pMatrix2,pResult, Size);
     // printf("The result:\n");
-    // PrintResult(pResult,Size,Size);
 	Finish = GetTime();
+	//PrintResult(pResult,Size,Size);
 	Duration = Finish - Start;
 	// TestResult(pMatrix, pMatrix2, pResult, Size);
 	// Printing the time spent by matrix-matrix multiplication
