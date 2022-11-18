@@ -28,10 +28,12 @@ void PrintMatrix (double* result, int RowCount, int ColCount) {
     }
 }
 
-void RandomDataInitialization(double* pMatrix, int Size) {
+void RandomDataInitialization(double* pMatrix, int Size, int threads) {
     int i, j; 
     time_t t;
     srand((unsigned) time(&t) );
+    omp_set_num_threads(threads);
+    #pragma omp parallel for
     for (i=0; i<Size; i++) {
         for (j=0; j<Size; j++)
             pMatrix[i*Size+j] = rand()/ double(100);
@@ -44,9 +46,9 @@ void pickNumThreads(int threads)
     scanf("%d", &threads);
 }
 
-void ProcessInitialization (double* &pMatrix, int &Size) {
+void ProcessInitialization (double* &pMatrix, int &Size, int threads) {
     pMatrix = new double [Size*Size];
-    RandomDataInitialization(pMatrix, Size);
+    RandomDataInitialization(pMatrix, Size, threads);
 }
 
 double ParallelMinMax(double *pMatrix, int size, int threads)
@@ -56,8 +58,8 @@ double ParallelMinMax(double *pMatrix, int size, int threads)
     #pragma omp parallel for
     for (int i = 0; i < size; i++)
     {
-        min = pMatrix[i *size + 0];
-        for (int j = 1; j < size; j++)
+        //min = pMatrix[i *size + 0];
+        for (int j = 0; j < size; j++)
         {
             if (min > pMatrix[i*size+ j]) 
                 min = pMatrix[i*size+ j];
@@ -70,7 +72,6 @@ double ParallelMinMax(double *pMatrix, int size, int threads)
 
 void test(int* arrayTestSize, int *arrayNumThreads, double * &result,  int numTest, int numThreads)
 {
-    // int size, threads=  8;
     double Start, Finish;
     result = new double[numTest * numThreads];
 
@@ -81,7 +82,7 @@ void test(int* arrayTestSize, int *arrayNumThreads, double * &result,  int numTe
         {
             int size = arrayTestSize[i];
             int threads = arrayNumThreads[j];
-            ProcessInitialization(pMatrix, size);
+            ProcessInitialization(pMatrix, size, threads);
             Start = GetTime();
             ParallelMinMax(pMatrix, size, threads);
             Finish = GetTime();
