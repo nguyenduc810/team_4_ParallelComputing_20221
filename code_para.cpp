@@ -13,6 +13,15 @@ double GetTime()
 	return now.tv_sec+now.tv_usec/1000000.0;
 }
 
+void Input(int &choose)
+{
+    printf("Please Choose Parallel or Serial:\n");
+    printf("1. Serial\n");
+    printf("2. Parallel\n");
+    printf("Input = ");
+    scanf("%d", &choose);
+
+}
 void PrintMatrix (double* result, int RowCount, int ColCount) {
     int i, j; 
     for (i=0; i<RowCount; i++) {
@@ -124,14 +133,22 @@ void TimeSerial(int* arrayTestSize, double * &result,  int numTest)
 int main()
 {
     int arrayTestSize[] = { 1000, 2000, 3000, 4000, 5000,6000,7000,8000,9000,10000 };
-    int arrayNumThreads[] = {2};
+    int arrayNumThreads[] = {2, 4, 6 , 8};
     int arrSize = sizeof(arrayTestSize)/4, numThreads = sizeof(arrayNumThreads)/4;
     double *resultPara;
     double *resultSerial;
-    TimeSerial(arrayTestSize,resultSerial,arrSize);
-    PrintMatrix(resultSerial,arrSize,1);
-    //TimeParallel(arrayTestSize, arrayNumThreads, resultPara, arrSize, numThreads);
-    //PrintMatrix(resultPara, arrSize, numThreads);
+    int choose;
+    Input(choose);
+    if (choose ==1)
+    {
+        TimeSerial(arrayTestSize,resultSerial,arrSize);
+        PrintMatrix(resultSerial,arrSize,1);
+    }
+    else
+    {
+        TimeParallel(arrayTestSize, arrayNumThreads, resultPara, arrSize, numThreads);
+        PrintMatrix(resultPara, arrSize, numThreads);
+    }
     delete [] resultPara;
     delete [] resultSerial;
 }

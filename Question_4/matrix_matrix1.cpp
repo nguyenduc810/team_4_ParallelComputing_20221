@@ -88,11 +88,11 @@ void SerialResultCalculation(double* pMatrix, double* pMatrix2,
 void ParallelResultCalculation(double* pMatrix, double* pMatrix2,
 	double* pResult, int Size) {
 	int i, j, k ; 
-omp_set_num_threads(6);
-#pragma omp parallel for private (i,j, k)
+omp_set_num_threads(4);
+#pragma omp parallel for private (j)
 	for (i = 0; i < Size; i++) 
     {
-		//printf("iter %d", i);
+		printf("iter %d \t", i);
 		for (j = 0; j < Size; j++){
             double dot = 0;
 			for (k = 0; k < Size; k++) {
