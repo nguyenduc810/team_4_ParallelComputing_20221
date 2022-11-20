@@ -43,9 +43,27 @@ void ProcessInitialization (double* &pMatrix, int &Size) {
     RandomDataInitialization(pMatrix, Size);
 }
 
+double SerialMinMax(double *pMatrix, int size)
+{
+    int i,j;
+    double max = -10e4, min = -10e4;
+    for (i = 0; i < size; i++)
+    {
+        min = pMatrix[i *size + 0];
+        for (j = 1; j < size; j++)
+        {
+            if (min > pMatrix[i*size+ j])
+                min = pMatrix[i*size+ j];
+        }
+        if (max < min)
+            max = min;
+    }
+    return max;
+}
+
 double ParallelMinMax(double *pMatrix, int size, int threads)
 {
-	int i,j;
+    int i,j;
     double max = -10e4, min = -10e4;
     omp_set_num_threads(threads);
     #pragma omp parallel for private(i, j)
@@ -63,9 +81,8 @@ double ParallelMinMax(double *pMatrix, int size, int threads)
     return max;
 }
 
-void test(int* arrayTestSize, int *arrayNumThreads, double * &result,  int numTest, int numThreads)
+void TimeParallel(int* arrayTestSize, int *arrayNumThreads, double * &result,  int numTest, int numThreads)
 {
-    // int size, threads=  8;
     double Start, Finish;
     result = new double[numTest * numThreads];
 
@@ -86,13 +103,35 @@ void test(int* arrayTestSize, int *arrayNumThreads, double * &result,  int numTe
     } 
 }
 
+void TimeSerial(int* arrayTestSize, double * &result,  int numTest)
+{
+    double Start, Finish;
+    result = new double[numTest];
+
+    for(int i = 0; i < numTest; i++)
+    {
+        double* pMatrix;
+        int size = arrayTestSize[i];
+        ProcessInitialization(pMatrix, size);
+        Start = GetTime();
+        SerialMinMax(pMatrix, size);
+        Finish = GetTime();
+        result[i] = Finish - Start;
+        delete [] pMatrix;
+    }
+}
+
 int main()
 {
-    int arrayTestSize[] = { 1000, 2000, 3000, 4000, 5000 };
-    int arrayNumThreads[] = {1,2,3,4};
+    int arrayTestSize[] = { 1000, 2000, 3000, 4000, 5000,6000,7000,8000,9000,10000 };
+    int arrayNumThreads[] = {2};
     int arrSize = sizeof(arrayTestSize)/4, numThreads = sizeof(arrayNumThreads)/4;
-    double * result;
-    test(arrayTestSize, arrayNumThreads, result, arrSize, numThreads);
-    PrintMatrix(result, arrSize, numThreads);
-    delete [] result;
+    double *resultPara;
+    double *resultSerial;
+    TimeSerial(arrayTestSize,resultSerial,arrSize);
+    PrintMatrix(resultSerial,arrSize,1);
+    //TimeParallel(arrayTestSize, arrayNumThreads, resultPara, arrSize, numThreads);
+    //PrintMatrix(resultPara, arrSize, numThreads);
+    delete [] resultPara;
+    delete [] resultSerial;
 }
