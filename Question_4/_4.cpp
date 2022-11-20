@@ -59,8 +59,8 @@ double ParallelMinMax(double *pMatrix, int size, int threads)
     #pragma omp parallel for private (i,j)
     for (i = 0; i < size; i++)
     {
-        //min = pMatrix[i *size + 0];
-        for (int j = 0; j < size; j++)
+        min = pMatrix[i *size + 0];
+        for (int j = 1; j < size; j++)
         {
             if (min > pMatrix[i*size+ j]) 
                 min = pMatrix[i*size+ j];
